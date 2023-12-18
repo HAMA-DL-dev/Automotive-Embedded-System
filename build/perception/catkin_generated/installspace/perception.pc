@@ -1,0 +1,8 @@
+prefix=/home/nvidia/ae_ws/install
+
+Name: perception
+Description: Description of perception
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: cv_bridge pcl_ros rospy std_msgs geometry_msgs

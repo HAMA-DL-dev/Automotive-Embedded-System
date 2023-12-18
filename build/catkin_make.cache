@@ -1,0 +1,2 @@
+command:control:custom_msgs:perception:qcar:rplidar_ros:urdf_qcar:vision_opencv/cv_bridge:vision_opencv/image_geometry:vision_opencv/opencv_tests:vision_opencv/vision_opencv
+-DCATKIN_DEVEL_PREFIX=/home/nvidia/ae_ws/devel -DCMAKE_INSTALL_PREFIX=/home/nvidia/ae_ws/install -G Unix Makefiles

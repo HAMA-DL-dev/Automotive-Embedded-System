@@ -1,0 +1,9 @@
+scan_filter_chain:
+- name: speckle_filter
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    # filtering 2 : distance / range
+    filter_type: 1
+    max_range: 0.01
+    max_range_difference: 0.1
+    filter_window: 5

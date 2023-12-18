@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/nvidia/ae_ws/install/setup.sh

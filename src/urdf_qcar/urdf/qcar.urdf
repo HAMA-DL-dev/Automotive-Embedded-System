@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<robot name="qcar_urdf">
+
+    <link name="laser">
+        <origin rpy="0.0 0 0" xyz="0 0 0"/>
+    </link>
+
+    <link name="body">
+        <visual>
+            <origitn rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarBody.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="body"/>
+        </visual>
+        <collision>
+            <origin rpy="0.0 0 0" xyz="0 0 -21.0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarBody.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="rear_to_body" type="fixed">
+        <parent link = "laser"/>
+        <child link = "body"/>
+        <origin xyz="0.0 0.02 -0.23" rpy="0 0 1.5708"/>
+    </joint>
+
+    <link name="lidar">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarLidar.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="lidar"/>
+        </visual>
+        <collision>
+            <origitn rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarLidar.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="body_to_lidar" type="fixed">
+        <parent link = "laser"/>
+        <child link = "lidar"/>
+    </joint>
+
+
+    <!-- <link name="steeringHub_L">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarSteeringHubL.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="steeringHub_L"/>
+        </visual>
+        <collision>
+            <origitn rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarSteeringHubL.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="lidar_to_steerL" type="fixed">
+        <parent link = "body"/>
+        <child link = "steeringHub_L"/>
+        <origin xyz="0.05 -0.50 0" rpy="0 0 0"/>
+    </joint>
+    <link name="steeringHub_R">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarSteeringHubR.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="steeringHub_R"/>
+        </visual>
+        <collision>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarSteeringHubR.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="steerL_to_steerR" type="fixed">
+        <parent link = "steeringHub_L"/>
+        <child link = "steeringHub_R"/>
+        <origin xyz="0 0 -0.23" rpy="0 0 1.5708"/>
+    </joint> -->
+
+    <link name="wheel_left">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarWheel.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="wheel"/>
+        </visual>
+        <collision>
+            <origitn rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarWheel.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="body_to_wheelL" type="fixed">
+        <parent link = "body"/>
+        <child link = "wheel_left"/>
+        <origin xyz="-0.20  0.13 0.05" rpy="0 0 0"/>
+    </joint>
+    <link name="wheel_right">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/visual/QCarWheel.dae" scale="0.15 0.15 0.15"/>
+            </geometry>
+            <material name="wheel"/>
+        </visual>
+        <collision>
+            <origitn rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://urdf_qcar/meshes/collision/QCarWheel.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="wheelL_to_wheelR" type="fixed">
+        <parent link = "wheel_left"/>
+        <child link = "wheel_right"/>
+        <origin xyz="0.0  -0.21 0.0" rpy="0 0 0"/>
+    </joint>
+
+
+</robot>

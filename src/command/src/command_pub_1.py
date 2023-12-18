@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+
+# from __future__ import division, print_function, absolute_import
+import rospy
+import numpy as np
+import sys, select, os
+
+import pygame
+from geometry_msgs.msg import Vector3Stamped
+import time
+
+if os.name == 'nt':
+  import msvcrt
+else:
+  import tty, termios
+
+BURGER_MAX_LIN_VEL = 0.22
+BURGER_MAX_ANG_VEL = 2.84
+
+WAFFLE_MAX_LIN_VEL = 0.26
+WAFFLE_MAX_ANG_VEL = 1.82
+
+LIN_VEL_STEP_SIZE = 0.01
+ANG_VEL_STEP_SIZE = 0.03
+
+def vels(target_linear_vel, target_angular_vel):
+    return "currently:\tlinear vel %s\t angular vel %s " % (target_linear_vel,target_angular_vel)
+
+
+def getKey(settings):
+    if os.name == 'nt':
+      return msvcrt.getch()
+    tty.setraw(sys.stdin.fileno())
+    rlist,_,_ = select.select([sys.stdin],[],[],0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+def checkLinearLimitVelocity(vel):
+
+    if vel > 0.5:
+        vel=0.5
+    # if turtlebot3_model == "burger":
+    #   vel = constrain(vel, -BURGER_MAX_LIN_VEL, BURGER_MAX_LIN_VEL)
+    # elif turtlebot3_model == "waffle" or turtlebot3_model == "waffle_pi":
+    #   vel = constrain(vel, -WAFFLE_MAX_LIN_VEL, WAFFLE_MAX_LIN_VEL)
+    # else:
+    #   vel = constrain(vel, -BURGER_MAX_LIN_VEL, BURGER_MAX_LIN_VEL)
+        #if np.abs(vel)<=0.03 and abs(vel)>=1e-6:
+        #    vel = np.sign(vel)*0.03   
+    return vel
+
+def checkAngularLimitVelocity(vel):
+
+    if np.abs(vel) > 0.5:
+        vel=0.5*np.sign(vel)
+    # if turtlebot3_model == "burger":
+    #   vel = constrain(vel, -BURGER_MAX_ANG_VEL, BURGER_MAX_ANG_VEL)
+    # elif turtlebot3_model == "waffle" or turtlebot3_model == "waffle_pi":
+    #   vel = constrain(vel, -WAFFLE_MAX_ANG_VEL, WAFFLE_MAX_ANG_VEL)
+    # else:
+    #   vel = constrain(vel, -BURGER_MAX_ANG_VEL, BURGER_MAX_ANG_VEL)
+    
+    
+    return vel
+
+
+class CommandNode(object):
+    def __init__(self):
+        
+        self.test = 0
+        self.msg = None
+        self.cmd_pub_ = rospy.Publisher('/qcar/user_command', Vector3Stamped, queue_size=100)
+		
+        if os.name != 'nt':
+            self.settings = termios.tcgetattr(sys.stdin)
+
+        
+        self.status = 0
+        self.target_linear_vel   = 0.0
+        self.target_angular_vel  = 0.0
+        self.control_linear_vel  = 0.0
+        self.control_angular_vel = 0.0
+        
+        while True:
+            key = getKey(self.settings)
+            self.process_command(key)
+            if (key == '\x03'):
+                break
+            time.sleep(0.01)
+
+    def process_command(self,key):
+        if key == 'k' :
+            self.target_linear_vel = checkLinearLimitVelocity(self.target_linear_vel + LIN_VEL_STEP_SIZE)
+            self.status = self.status + 1
+            print(vels(self.target_linear_vel,self.target_angular_vel))
+        elif key == 'l' :
+            self.target_linear_vel = checkLinearLimitVelocity(self.target_linear_vel - LIN_VEL_STEP_SIZE)
+            self.status = self.status + 1
+            print(vels(self.target_linear_vel,self.target_angular_vel))
+        elif key == 'a' :
+            self.target_angular_vel = checkAngularLimitVelocity(self.target_angular_vel + ANG_VEL_STEP_SIZE)
+            self.status = self.status + 1
+            print(vels(self.target_linear_vel,self.target_angular_vel))
+        elif key == 'd' :
+            self.target_angular_vel = checkAngularLimitVelocity(self.target_angular_vel - ANG_VEL_STEP_SIZE)
+            self.status = self.status + 1
+            print(vels(self.target_linear_vel,self.target_angular_vel))
+        elif key == '' or key == ';':
+            temp_ang = self.target_angular_vel -8*np.sign(self.target_angular_vel)*ANG_VEL_STEP_SIZE
+            print(temp_ang)
+            if self.target_angular_vel*temp_ang <=0:
+                temp_ang = -0.06
+            self.target_angular_vel = checkAngularLimitVelocity(temp_ang)
+            #self.target_linear_vel   = 0.0
+            #self.control_linear_vel  = 0.0
+            #self.target_angular_vel  = 0.0
+            #self.control_angular_vel = 0.0
+            print(vels(self.target_linear_vel, self.target_angular_vel))
+        elif key == 's' :
+            self.target_linear_vel   = 0.0
+            self.control_linear_vel  = 0.0
+            self.target_angular_vel  = -0.06
+            self.control_angular_vel = 0
+        else :
+            self.target_angular_vel  = -0.06
+            self.control_angular_vel = 0
+            print(vels(self.target_linear_vel, self.target_angular_vel))
+        if self.status == 20 :
+            # print(msg)
+            self.status = 0
+
+        # for event in pygame.event.get():
+        #     if event.type == pygame. :
+        #         pressed = pygame.key.get_pressed()
+        #         buttons = [pygame.key.name(k) for k,v in enumerate(pressed) if v]
+        #         test=buttons[0]
+        
+        msg=Vector3Stamped()
+        # if test == "left":
+        #     self.test -= 0.05
+        # elif test=="right":
+        #     self.test += 0.05
+        
+        # self.test = np.clip(self.test, -0.5, 0.5)
+
+        msg.vector.x= float(self.target_linear_vel) 
+        msg.vector.y = float(self.target_angular_vel)
+        # float(self.target_angular_vel)
+        self.cmd_pub_.publish(msg)
+
+if __name__ == '__main__':
+
+    rospy.init_node('command_node')
+    r = CommandNode()
+    
+    rospy.spin()
